@@ -26,6 +26,7 @@ class SetKnowledgeTrendingSinusoids(Dataset):
         self.split = split
         self.knowledge_type = knowledge_type
         self.knowledge_input_dim = 4
+        self.noisy_knowledge = False
 
         self._split_data()
 
@@ -72,6 +73,12 @@ class SetKnowledgeTrendingSinusoids(Dataset):
             .values
         )
         knowledge = torch.tensor(knowledge, dtype=torch.float32).reshape(3, 1)
+        if self.noisy_knowledge:
+            knowledge1 = torch.distributions.Normal(knowledge[0].squeeze(), 1).sample()
+            knowledge2 = torch.distributions.Normal(knowledge[1].squeeze(), 1).sample()
+            knowledge3 = torch.distributions.Normal(knowledge[2].squeeze(), 1).sample()
+            
+        knowledge = torch.tensor([knowledge1, knowledge2, knowledge3], dtype=torch.float32).reshape(3, 1)
         indicator = torch.eye(3)
         knowledge = torch.cat([indicator, knowledge], dim=1)
 

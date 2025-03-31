@@ -12,6 +12,7 @@ N = 2000
 curves = []
 curve_ids = []
 knowledge_ls = []
+knowledge_noisy_ls = []
 
 # Synthetic data
 for i in range(N):
@@ -20,10 +21,12 @@ for i in range(N):
     c = np.random.uniform(-1, 1)
     x = np.linspace(-2, 2, 100)
     y = sample_function(a, b, c, x)
-    knowledge = (a, b, c)
+    knowledge = (a, b, c) # sort of true knowledge without noise
+    knowledge_noisy = (np.random.normal(a, 1), np.random.normal(b, 1), np.random.normal(c, 1)) # noisy observation of the true undelying knowledge
     curves.append(y)
     curve_ids.append(i)
     knowledge_ls.append(knowledge)
+    knowledge_noisy_ls.append(knowledge_noisy)
 
 curves_df = pd.DataFrame(np.stack(curves, axis=0))
 curves_df["curve_id"] = curve_ids
@@ -31,9 +34,14 @@ knowledge_df = pd.DataFrame(knowledge_ls)
 knowledge_df["curve_id"] = curve_ids
 knowledge_df.columns = ["a", "b", "c", "curve_id"]
 
+knowledge_noisy_df = pd.DataFrame(knowledge_noisy_ls)
+knowledge_noisy_df["curve_id"] = curve_ids
+knowledge_noisy_df.columns = ["a", "b", "c", "curve_id"]
+
 
 curves_df.to_csv("../data/trending-sinusoids/data.csv", index=False)
 knowledge_df.to_csv("../data/trending-sinusoids/knowledge.csv", index=False)
+knowledge_noisy_df.to_csv("../data/trending-sinusoids/knowledge_noisy.csv", index=False)
 
 # random splitting
 train_ids = list(np.random.choice(curves_df.curve_id, 1000, replace=False))
@@ -52,45 +60,45 @@ split_df.to_csv("../data/trending-sinusoids/splits.csv", index=False)
 
 # %%
 
-# Synthetic data with dist shift
-curves = []
-curve_ids = []
-knowledge_ls = []
+# # Synthetic data with dist shift
+# curves = []
+# curve_ids = []
+# knowledge_ls = []
 
-# Training and Eval curves
-for i in range(1500):
-    a = np.random.uniform(-1, 1)
-    b = np.random.normal(2, 1)
-    c = np.random.uniform(-1, 1)
-    x = np.linspace(-2, 2, 100)
-    y = sample_function(a, b, c, x)
-    knowledge = (a, b, c)
-    curves.append(y)
-    curve_ids.append(i)
-    knowledge_ls.append(knowledge)
+# # Training and Eval curves
+# for i in range(1500):
+#     a = np.random.uniform(-1, 1)
+#     b = np.random.normal(2, 1)
+#     c = np.random.uniform(-1, 1)
+#     x = np.linspace(-2, 2, 100)
+#     y = sample_function(a, b, c, x)
+#     knowledge = (a, b, c)
+#     curves.append(y)
+#     curve_ids.append(i)
+#     knowledge_ls.append(knowledge)
 
-# Testing curves
-for i in range(1500, 2000):
-    a = np.random.uniform(-1, 1)
-    b = np.random.normal(3, 1)
-    c = np.random.uniform(-1, 1)
-    x = np.linspace(-2, 2, 100)
-    y = sample_function(a, b, c, x)
-    knowledge = (a, b, c)
-    curves.append(y)
-    curve_ids.append(i)
-    knowledge_ls.append(knowledge)
+# # Testing curves
+# for i in range(1500, 2000):
+#     a = np.random.uniform(-1, 1)
+#     b = np.random.normal(3, 1)
+#     c = np.random.uniform(-1, 1)
+#     x = np.linspace(-2, 2, 100)
+#     y = sample_function(a, b, c, x)
+#     knowledge = (a, b, c)
+#     curves.append(y)
+#     curve_ids.append(i)
+#     knowledge_ls.append(knowledge)
 
-splits = ["train"] * 1000 + ["val"] * 500 + ["test"] * 500
+# splits = ["train"] * 1000 + ["val"] * 500 + ["test"] * 500
 
-curves_df = pd.DataFrame(np.stack(curves, axis=0))
-curves_df["curve_id"] = curve_ids
-knowledge_df = pd.DataFrame(knowledge_ls)
-knowledge_df["curve_id"] = curve_ids
-knowledge_df.columns = ["a", "b", "c", "curve_id"]
-split_df = pd.DataFrame({"curve_id": curve_ids, "split": splits})
+# curves_df = pd.DataFrame(np.stack(curves, axis=0))
+# curves_df["curve_id"] = curve_ids
+# knowledge_df = pd.DataFrame(knowledge_ls)
+# knowledge_df["curve_id"] = curve_ids
+# knowledge_df.columns = ["a", "b", "c", "curve_id"]
+# split_df = pd.DataFrame({"curve_id": curve_ids, "split": splits})
 
-curves_df.to_csv("../data/trending-sinusoids-dist-shift/data.csv", index=False)
-knowledge_df.to_csv("../data/trending-sinusoids-dist-shift/knowledge.csv", index=False)
-split_df.to_csv("../data/trending-sinusoids-dist-shift/splits.csv", index=False)
+# curves_df.to_csv("../data/trending-sinusoids-dist-shift/data.csv", index=False)
+# knowledge_df.to_csv("../data/trending-sinusoids-dist-shift/knowledge.csv", index=False)
+# split_df.to_csv("../data/trending-sinusoids-dist-shift/splits.csv", index=False)
 # %%
